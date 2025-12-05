@@ -75,7 +75,7 @@ def set_api_key(api_key: str, key_file: str = "api_key.txt") -> None:
 
 def chat_completion(
     messages: List[Dict[str, str]],
-    model: str = "free",
+    model: str = "openai/gpt-oss-120b:free",
     api_key: Optional[str] = None,
     temperature: float = 0.7,
     max_tokens: int = 1024,

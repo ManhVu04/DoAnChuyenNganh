@@ -22,7 +22,8 @@ from translator_mini import speech_to_text as stt
 def run_voice(mic_index: Optional[int], voice_output: bool, tts_rate: int, loop: bool,
               language_in: str = "en-US"):
     """Voice input translation mode."""
-    bot = ChatbotTranslatorMini(voice_output=voice_output, tts_rate=tts_rate, use_gtts=False)
+    # Dùng gTTS mặc định để tránh lỗi pyttsx3 không phát ở lượt thứ 2
+    bot = ChatbotTranslatorMini(voice_output=voice_output, tts_rate=tts_rate, use_gtts=True)
 
     def one_turn() -> None:
         try:
@@ -63,7 +64,8 @@ def run_voice(mic_index: Optional[int], voice_output: bool, tts_rate: int, loop:
 
 def run_text(voice_output: bool, tts_rate: int, input_text: Optional[str]):
     """Text input translation mode."""
-    bot = ChatbotTranslatorMini(voice_output=voice_output, tts_rate=tts_rate, use_gtts=False)
+    # Dùng gTTS mặc định để ổn định phát âm
+    bot = ChatbotTranslatorMini(voice_output=voice_output, tts_rate=tts_rate, use_gtts=True)
 
     if input_text is not None:
         vi = bot.respond_text(input_text)
