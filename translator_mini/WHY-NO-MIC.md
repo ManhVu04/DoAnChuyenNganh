@@ -64,7 +64,7 @@
 ### 1. Development (Test Logic)
 **👉 Dùng Docker Desktop với TEXT MODE**
 ```powershell
-docker run -it --rm translator-mini python3 main.py --mode text
+docker run -it --rm translator-mini python3 -m translator_mini.main --mode text
 ```
 - ✅ Test được translation logic
 - ✅ Test được chatbot flow
@@ -77,7 +77,7 @@ docker run -it --rm translator-mini python3 main.py --mode text
 pip install -r requirements.txt
 
 # Chạy với microphone
-python main.py --mode voice --voice-output --loop
+python -m translator_mini.main --mode voice --voice-output --loop
 ```
 - ✅ Full voice input/output
 - ✅ Test như user thật sử dụng
@@ -91,7 +91,7 @@ docker run -it --rm \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --mode voice --voice-output --loop
+  python3 -m translator_mini.main --mode voice --voice-output --loop
 ```
 - ✅ Container có direct access đến /dev/snd
 - ✅ ALSA/PulseAudio work natively

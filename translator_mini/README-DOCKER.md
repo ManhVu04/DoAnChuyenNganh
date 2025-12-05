@@ -48,17 +48,17 @@ docker build -t translator-mini:latest .
 
 #### Chạy text mode (gõ tiếng Anh, nhận tiếng Việt)
 ```powershell
-docker run -it --rm translator-mini python3 main.py --mode text
+docker run -it --rm translator-mini python3 -m translator_mini.main --mode text
 ```
 
 #### Test một câu nhanh
 ```powershell
-docker run --rm translator-mini python3 main.py --mode text --input "Hello, how are you?"
+docker run --rm translator-mini python3 -m translator_mini.main --mode text --input "Hello, how are you?"
 ```
 
 #### Chạy với voice output (TTS trong container)
 ```powershell
-docker run -it --rm translator-mini python3 main.py --mode text --voice-output
+docker run -it --rm translator-mini python3 -m translator_mini.main --mode text --voice-output
 ```
 **Lưu ý:** Audio output có thể không nghe được trên Windows Docker Desktop. Xem phần "Audio Support" bên dưới.
 
@@ -73,12 +73,12 @@ docker run -it --rm translator-mini python3 main.py --mode text --voice-output
 
 #### Chạy interactive (text mode)
 ```powershell
-docker-compose run --rm translator python3 main.py --mode text
+docker-compose run --rm translator python3 -m translator_mini.main --mode text
 ```
 
 #### Test hệ thống
 ```powershell
-docker-compose run --rm translator python3 test_docker.py
+docker-compose run --rm translator python3 -m translator_mini.test_docker
 ```
 
 ---
@@ -99,14 +99,14 @@ docker-compose run --rm translator python3 test_docker.py
 #### Cách 1: Chạy Text Mode trên Docker Desktop (Đơn giản nhất)
 ```powershell
 # Gõ text tiếng Anh → Nhận text tiếng Việt
-docker run -it --rm translator-mini python3 main.py --mode text
+docker run -it --rm translator-mini python3 -m translator_mini.main --mode text
 ```
 
 #### Cách 2: Chạy trực tiếp trên Windows (Không dùng Docker)
 ```powershell
 # Cài Python trực tiếp trên Windows
 pip install -r requirements.txt
-python main.py --mode voice --voice-output --loop
+python -m translator_mini.main --mode voice --voice-output --loop
 ```
 **Lưu ý:** Cần cài PyAudio trên Windows (hơi phức tạp).
 
@@ -118,7 +118,7 @@ docker run -it --rm \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --mode voice --voice-output --loop
+  python3 -m translator_mini.main --mode voice --voice-output --loop
 ```
 
 #### Cách 4: Thử trong WSL2 (Experimental - Không đảm bảo)
@@ -137,7 +137,7 @@ docker run -it --rm \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --list-mics
+  python3 -m translator_mini.main --list-mics
 ```
 **Lưu ý:** WSL2 cũng không có direct access tới Windows microphone. Cần cấu hình PulseAudio phức tạp.
 

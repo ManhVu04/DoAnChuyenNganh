@@ -1,40 +1,53 @@
 import argparse
 from typing import Optional
 
-from chatbot import ChatbotTranslatorMini
-import speech_to_text as stt
+from translator_mini.chatbot import ChatbotTranslatorMini
+from translator_mini import speech_to_text as stt
 
 
 def run_voice(mic_index: Optional[int], voice_output: bool, tts_rate: int, loop: bool,
               language_in: str = "en-US"):
-    bot = ChatbotTranslatorMini(voice_output=voice_output, tts_rate=tts_rate)
+    bot = ChatbotTranslatorMini(voice_output=voice_output, tts_rate=tts_rate, use_gtts=False)
 
     def one_turn() -> None:
-        text = stt.listen_and_recognize(mic_index=mic_index, language=language_in)
-        if not text:
-            print("[Main] No recognized text.")
-            return
-        vi = bot.respond_text(text)
-        if vi is None:
-            print("[Main] Translation failed.")
-        else:
-            print(f"[Main] EN: {text}")
-            print(f"[Main] VI: {vi}")
+        try:
+            text = stt.listen_and_recognize(mic_index=mic_index, language=language_in)
+            if not text:
+                print("[Main] No recognized text. Try again...")
+                return
+            
+            print(f"[Main] 🎤 Heard: {text}")
+            vi = bot.respond_text(text)
+            
+            if vi is None:
+                print("[Main] ❌ Translation failed.")
+            else:
+                print(f"[Main] 🇻🇳 Vietnamese: {vi}")
+                print()  # Empty line for readability
+        except Exception as e:
+            print(f"[Main] ⚠️ Error in turn: {e}")
+            print("[Main] Continuing...")
 
     if loop:
-        print("[Main] Voice mode (loop). Press Ctrl+C to stop.")
+        print("[Main] 🎙️ Voice mode (continuous loop).")
+        print("[Main] Speak English and I'll translate to Vietnamese.")
+        print("[Main] Press Ctrl+C to stop.\n")
         try:
+            turn_count = 0
             while True:
+                turn_count += 1
+                print(f"[Main] --- Turn {turn_count} ---")
                 one_turn()
+                print("[Main] 👂 Listening again...\n")
         except KeyboardInterrupt:
-            print("\n[Main] Stopped.")
+            print("\n[Main] 🛑 Stopped after {turn_count} turns.")
     else:
         print("[Main] Voice mode (single turn).")
         one_turn()
 
 
 def run_text(voice_output: bool, tts_rate: int, input_text: Optional[str]):
-    bot = ChatbotTranslatorMini(voice_output=voice_output, tts_rate=tts_rate)
+    bot = ChatbotTranslatorMini(voice_output=voice_output, tts_rate=tts_rate, use_gtts=False)
 
     if input_text is not None:
         vi = bot.respond_text(input_text)
@@ -74,8 +87,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Chatbot Translator Mini (EN -> VI)")
     parser.add_argument("--mode", choices=["voice", "text"], default="voice",
                         help="Run in voice (mic) or text (keyboard) mode")
-    parser.add_argument("--voice-output", action="store_true", help="Speak Vietnamese output")
-    parser.add_argument("--tts-rate", type=int, default=160, help="TTS speech rate (wpm)")
+    parser.add_argument("--voice-output", action="store_true", help="Speak Vietnamese output (may have poor voice quality)")
+    parser.add_argument("--tts-rate", type=int, default=140, help="TTS speech rate (wpm, slower=clearer)")
     parser.add_argument("--mic-index", type=int, default=None, help="Microphone device index")
     parser.add_argument("--list-mics", action="store_true", help="List microphone devices and exit")
     parser.add_argument("--loop", action="store_true", help="Voice mode: continuous loop")

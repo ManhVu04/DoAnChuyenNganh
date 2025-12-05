@@ -109,7 +109,7 @@ docker run -it --rm \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --list-mics
+  python3 -m translator_mini.main --list-mics
 ```
 
 ### Single turn (nói một lần)
@@ -119,7 +119,7 @@ docker run -it --rm \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --mode voice --voice-output
+  python3 -m translator_mini.main --mode voice --voice-output
 ```
 
 ### Continuous loop (liên tục lắng nghe)
@@ -129,7 +129,7 @@ docker run -it --rm \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --mode voice --voice-output --loop
+  python3 -m translator_mini.main --mode voice --voice-output --loop
 ```
 
 ### Background mode với docker-compose
@@ -150,7 +150,7 @@ services:
     stdin_open: true
     tty: true
     restart: unless-stopped
-    command: python3 main.py --mode voice --voice-output --loop
+    command: python3 -m translator_mini.main --mode voice --voice-output --loop
 EOF
 
 # Chạy
@@ -173,18 +173,18 @@ docker run -it --rm \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --mode voice --voice-output --tts-rate 140
+  python3 -m translator_mini.main --mode voice --voice-output --tts-rate 140
 ```
 
 ### Chọn microphone cụ thể
 ```bash
 # List mics trước
 docker run -it --rm --device /dev/snd --group-add audio \
-  translator-mini python3 main.py --list-mics
+  translator-mini python3 -m translator_mini.main --list-mics
 
 # Dùng mic index
 docker run -it --rm --device /dev/snd --group-add audio \
-  translator-mini python3 main.py --mode voice --mic-index 1 --voice-output
+  translator-mini python3 -m translator_mini.main --mode voice --mic-index 1 --voice-output
 ```
 
 ---
@@ -211,7 +211,7 @@ ExecStart=/usr/bin/docker run --rm --name translator \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --mode voice --voice-output --loop
+  python3 -m translator_mini.main --mode voice --voice-output --loop
 ExecStop=/usr/bin/docker stop translator
 Restart=always
 RestartSec=10
@@ -256,7 +256,7 @@ newgrp audio
 # Chạy với --privileged (temporary)
 docker run -it --rm --privileged \
   translator-mini \
-  python3 main.py --list-mics
+  python3 -m translator_mini.main --list-mics
 
 # Hoặc set permissions
 sudo chmod 666 /dev/snd/*

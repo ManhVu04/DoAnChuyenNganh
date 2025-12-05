@@ -24,7 +24,7 @@ services:
       - PYTHONUNBUFFERED=1
     
     # Default command - text mode for Docker Desktop testing
-    command: python3 main.py --mode text
+    command: python3 -m translator_mini.main --mode text
 
 # Note: Để test voice mode trên Windows Docker Desktop, 
 # bạn cần WSL2 hoặc chạy container với --privileged

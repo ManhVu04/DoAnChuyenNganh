@@ -9,11 +9,11 @@ cd x:\DoanChuyenNganh\translator_mini
 docker build -t translator-mini .
 
 # Test
-docker run --rm translator-mini python3 test_docker.py
+docker run --rm translator-mini python3 -m translator_mini.test_docker
 # Result: 4/5 tests PASS ✅
 
 # Dịch một câu
-docker run --rm translator-mini python3 main.py --mode text --input "Hello, how are you?"
+docker run --rm translator-mini python3 -m translator_mini.main --mode text --input "Hello, how are you?"
 # Output: Xin chào, bạn khỏe không? ✅
 ```
 
@@ -24,10 +24,10 @@ docker run --rm translator-mini python3 main.py --mode text --input "Hello, how 
 
 ```powershell
 # Interactive
-docker run -it --rm translator-mini python3 main.py --mode text
+docker run -it --rm translator-mini python3 -m translator_mini.main --mode text
 
 # One-shot
-docker run --rm translator-mini python3 main.py --mode text --input "Your text here"
+docker run --rm translator-mini python3 -m translator_mini.main --mode text --input "Your text here"
 ```
 
 **Kết quả:**
@@ -44,7 +44,7 @@ docker run --rm translator-mini python3 main.py --mode text --input "Your text h
 pip install -r requirements.txt
 
 # Chạy với voice
-python main.py --mode voice --voice-output --loop
+python -m translator_mini.main --mode voice --voice-output --loop
 ```
 
 **Kết quả mong đợi:**
@@ -65,7 +65,7 @@ docker run -it --rm \
   --device /dev/snd \
   --group-add audio \
   translator-mini \
-  python3 main.py --mode voice --voice-output --loop
+  python3 -m translator_mini.main --mode voice --voice-output --loop
 ```
 
 **Kết quả mong đợi:**
@@ -131,13 +131,13 @@ docker run -it --rm \
 .\quickstart.ps1
 
 # Test translation
-docker run --rm translator-mini python3 main.py --mode text --input "Good morning"
+docker run --rm translator-mini python3 -m translator_mini.main --mode text --input "Good morning"
 
 # Test suite
-docker run --rm translator-mini python3 test_docker.py
+docker run --rm translator-mini python3 -m translator_mini.test_docker
 
 # Interactive text mode
-docker run -it --rm translator-mini python3 main.py --mode text
+docker run -it --rm translator-mini python3 -m translator_mini.main --mode text
 
 # Debug shell
 docker run -it --rm translator-mini /bin/bash

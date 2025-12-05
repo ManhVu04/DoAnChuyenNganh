@@ -26,8 +26,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY *.py .
+# Copy application code as a package
+COPY *.py ./translator_mini/
+RUN touch ./translator_mini/__init__.py
 
 # Create non-root user for security
 RUN useradd -m -u 1000 chatbot && \
@@ -36,4 +37,4 @@ RUN useradd -m -u 1000 chatbot && \
 USER chatbot
 
 # Default command: show help
-CMD ["python3", "main.py", "--help"]
+CMD ["python3", "-m", "translator_mini.main", "--help"]

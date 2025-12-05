@@ -49,7 +49,7 @@ def test_translation():
     print("=" * 60)
     
     try:
-        from translator import translate_en_to_vi
+        from translator_mini.translator import translate_en_to_vi
         
         test_cases = [
             ("Hello", "Xin chào"),
@@ -89,7 +89,7 @@ def test_tts():
             print(f"    [{i}] {voice.name} ({voice.id})")
         
         # Test speak without actually playing audio
-        from text_to_speech import speak
+        from translator_mini.text_to_speech import speak
         print("✓ TTS module loaded successfully")
         print("  Note: Audio output requires speaker device")
         
@@ -106,7 +106,7 @@ def test_stt():
     print("=" * 60)
     
     try:
-        import speech_to_text as stt
+        from translator_mini import speech_to_text as stt
         
         # List microphones (will show none in Docker without device passthrough)
         mics = stt.list_microphones()
@@ -133,7 +133,7 @@ def test_chatbot():
     print("=" * 60)
     
     try:
-        from chatbot import ChatbotTranslatorMini
+        from translator_mini.chatbot import ChatbotTranslatorMini
         
         bot = ChatbotTranslatorMini(voice_output=False)
         

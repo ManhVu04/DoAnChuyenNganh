@@ -11,14 +11,14 @@ Write-Host "   Chỉ có thể dùng TEXT MODE để test logic.`n" -ForegroundC
 Write-Host "🎯 CÁC CÁCH TEST:`n" -ForegroundColor Green
 
 Write-Host "1️⃣  Text Mode (Gõ tiếng Anh → Nhận tiếng Việt)" -ForegroundColor Cyan
-Write-Host "   docker run -it --rm translator-mini python3 main.py --mode text`n"
+Write-Host "   docker run -it --rm translator-mini python3 -m translator_mini.main --mode text`n"
 
 Write-Host "2️⃣  Test một câu nhanh" -ForegroundColor Cyan
-Write-Host '   docker run --rm translator-mini python3 main.py --mode text --input "Hello, how are you?"' -ForegroundColor White
+Write-Host '   docker run --rm translator-mini python3 -m translator_mini.main --mode text --input "Hello, how are you?"' -ForegroundColor White
 Write-Host ""
 
 Write-Host "3️⃣  Chạy test suite (kiểm tra tất cả modules)" -ForegroundColor Cyan
-Write-Host "   docker run --rm translator-mini python3 test_docker.py`n"
+Write-Host "   docker run --rm translator-mini python3 -m translator_mini.test_docker`n"
 
 Write-Host "4️⃣  Vào shell container để debug" -ForegroundColor Cyan
 Write-Host "   docker run -it --rm translator-mini /bin/bash`n"
@@ -30,12 +30,12 @@ Write-Host "`n💡 ĐỂ DÙNG VOICE MODE (microphone + speaker):`n" -Foreground
 
 Write-Host "   Option A: Chạy trực tiếp trên Windows (không Docker)" -ForegroundColor White
 Write-Host "            pip install -r requirements.txt"
-Write-Host "            python main.py --mode voice --voice-output --loop`n"
+Write-Host "            python -m translator_mini.main --mode voice --voice-output --loop`n"
 
 Write-Host "   Option B: Deploy lên Orange Pi / Raspberry Pi" -ForegroundColor White
 Write-Host "            docker run -it --rm --device /dev/snd \"
 Write-Host "              --group-add audio translator-mini \"
-Write-Host "              python3 main.py --mode voice --voice-output --loop`n"
+Write-Host "              python3 -m translator_mini.main --mode voice --voice-output --loop`n"
 
 Write-Host "📖 Chi tiết: Xem README-DOCKER.md`n" -ForegroundColor Magenta
 
@@ -58,10 +58,10 @@ if ($imageExists) {
     $choice = Read-Host "Do you want to run test suite now? (y/n)"
     if ($choice -eq 'y' -or $choice -eq 'Y') {
         Write-Host "`n🧪 Running test suite...`n" -ForegroundColor Cyan
-        docker run --rm translator-mini python3 test_docker.py
+        docker run --rm translator-mini python3 -m translator_mini.test_docker
         
         Write-Host "`n`n🚀 Now try text mode:`n" -ForegroundColor Green
-        Write-Host "   docker run -it --rm translator-mini python3 main.py --mode text`n" -ForegroundColor White
+        Write-Host "   docker run -it --rm translator-mini python3 -m translator_mini.main --mode text`n" -ForegroundColor White
     }
 } else {
     Write-Host "⚠️  Image 'translator-mini' not found`n" -ForegroundColor Yellow

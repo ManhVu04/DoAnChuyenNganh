@@ -45,7 +45,7 @@ If `pyaudio` fails to build, ensure `portaudio19-dev` is installed (as above), t
 
 ### Optional: List microphones
 ```bash
-python3 main.py --list-mics
+python -m translator_mini.main --list-mics
 ```
 
 ## Usage
@@ -54,23 +54,23 @@ python3 main.py --list-mics
 Listen from default mic, translate EN ➜ VI, print and optionally speak Vietnamese.
 ```bash
 # Single turn, with spoken Vietnamese output
-python3 main.py --mode voice --voice-output
+python -m translator_mini.main --mode voice --voice-output
 
 # Continuous loop listening
-python3 main.py --mode voice --voice-output --loop
+python -m translator_mini.main --mode voice --voice-output --loop
 
 # Choose a microphone index
-python3 main.py --mode voice --mic-index 2 --voice-output
+python -m translator_mini.main --mode voice --mic-index 2 --voice-output
 ```
 
 ### Text mode
 Type English and get Vietnamese output (optionally spoken).
 ```bash
-python3 main.py --mode text
-python3 main.py --mode text --voice-output
+python -m translator_mini.main --mode text
+python -m translator_mini.main --mode text --voice-output
 
 # One-shot translation
-python3 main.py --mode text --input "Hello, how are you?" --voice-output
+python -m translator_mini.main --mode text --input "Hello, how are you?" --voice-output
 ```
 
 ## Notes
@@ -103,7 +103,7 @@ See **[README-DOCKER.md](README-DOCKER.md)** for complete Docker Desktop instruc
 **Quick test on Docker Desktop:**
 ```bash
 docker build -t translator-mini .
-docker run --rm translator-mini python3 main.py --mode text --input "Hello, how are you?"
+docker run --rm translator-mini python3 -m translator_mini.main --mode text --input "Hello, how are you?"
 # Output: Xin chào, bạn khỏe không?
 ```
 
