@@ -27,25 +27,41 @@ source .venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-### 2. Basic Translation Mode
+### 2. Basic Translation Mode (EN ➜ VI)
+Nhập hoặc nói tiếng Anh, nhận kết quả tiếng Việt. Không cần API key.
 ```bash
-# Text mode - type English, get Vietnamese
-python -m translator_mini.main --mode text
+# Text: gõ tiếng Anh, có thể bật giọng nói tiếng Việt
+python -m translator_mini.main --mode text --voice-output
 
-# Voice mode - speak English, get Vietnamese
+# Voice: nói tiếng Anh, lặp liên tục
 python -m translator_mini.main --mode voice --voice-output --loop
+
+# Chọn microphone cụ thể
+python -m translator_mini.main --mode voice --mic-index 1 --voice-output
 ```
+Luồng đơn giản: Mic/Text (EN) → STT (nếu dùng mic) → Translator → Kết quả VI → TTS (tuỳ chọn).
 
 ### 3. AI Voice Assistant (NEW!)
+Hội thoại song ngữ và lệnh “dịch …”. Mặc định dùng gTTS (giọng tự nhiên); dùng `--no-gtts` để chuyển sang pyttsx3 offline.
 ```bash
-# Step 1: Get API key from https://openrouter.ai/keys
-# Step 2: Create api_key.txt with your key
+# B1: Lấy API key: https://openrouter.ai/keys
+# B2: Lưu vào api_key.txt
 echo "sk-or-v1-your-key-here" > api_key.txt
 
-# Step 3: Run AI Assistant
-python -m translator_mini.main --mode assistant-text  # Text chat
-python -m translator_mini.main --mode assistant       # Voice chat
+# B3: Chạy assistant
+python -m translator_mini.main --mode assistant          # Voice ↔ Voice
+python -m translator_mini.main --mode assistant-text     # Text input, voice output
+
+# Tuỳ chọn model tốt hơn
+python -m translator_mini.main --mode assistant --model gpt-4o-mini
+
+# Tắt giọng nói ở text mode
+python -m translator_mini.main --mode assistant-text --no-speak
+
+# Tắt gTTS (dùng pyttsx3)
+python -m translator_mini.main --mode assistant --no-gtts
 ```
+Luồng đơn giản: Mic/Text (VI/EN) → STT → OpenRouter AI (ghi nhớ lịch sử, hỗ trợ “dịch …”) → TTS + hiển thị.
 
 ---
 

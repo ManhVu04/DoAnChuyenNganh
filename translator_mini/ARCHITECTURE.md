@@ -1,4 +1,17 @@
-# 🎨 VISUAL ARCHITECTURE & FLOW
+# 🎨 ARCHITECTURE & FLOW (Tóm tắt dễ hiểu)
+
+- **Basic Translation Mode (EN ➜ VI)**
+  1) Mic/Text (tiếng Anh) → `speech_to_text.py` (nếu dùng mic)
+  2) `translator.py` (Google Translate qua deep-translator)
+  3) Kết quả tiếng Việt → in ra màn hình + (tuỳ chọn) `text_to_speech.py` phát giọng
+
+- **AI Voice Assistant (song ngữ, lệnh “dịch …”)**
+  1) Mic/Text (VI/EN) → `speech_to_text.py` (auto detect)
+  2) `openrouter_client.py` gọi OpenRouter (GPT-4o, Claude, Llama…)
+  3) Nếu người dùng nói “dịch …”: system prompt ép trả về bản dịch VI
+  4) Trả lời → `text_to_speech.py` (gTTS mặc định) + hiển thị trên màn hình
+
+---
 
 ## 🏗️ System Architecture
 
