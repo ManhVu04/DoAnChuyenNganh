@@ -114,10 +114,15 @@ def _play_audio_pygame(filepath: str, timeout_s: float = 15.0) -> bool:
         return False
 
 
-def speak_gtts(text: str, timeout_s: float = 15.0) -> bool:
+def speak_gtts(text: str, lang: str = "vi", timeout_s: float = 15.0) -> bool:
     """
     Speak using Google TTS (better Vietnamese voice).
     Requires: pip install gtts pygame
+    
+    Args:
+        text: Text to speak
+        lang: Language code ('vi' or 'en')
+        timeout_s: Max playback time
     
     Fully reinits pygame each call to prevent stuck state between turns.
     """
@@ -136,8 +141,8 @@ def speak_gtts(text: str, timeout_s: float = 15.0) -> bool:
             temp_file = fp.name
 
         # Generate speech using Google TTS
-        print(f"[TTS] 🔊 Generating audio: '{text[:30]}...'")
-        tts = gTTS(text=text, lang='vi', slow=False)
+        print(f"[TTS] 🔊 Generating audio ({lang}): '{text[:30]}...'")
+        tts = gTTS(text=text, lang=lang, slow=False)
         tts.save(temp_file)
 
         # Play audio
@@ -188,15 +193,17 @@ def speak_pyttsx3(text: str, rate: int = 140, volume: float = 1.0, prefer_vi: bo
 
 
 def speak(text: str, rate: int = 140, volume: float = 1.0, prefer_vi: bool = True, 
-          use_gtts: bool = True) -> bool:
+          use_gtts: bool = True, lang: str = "vi") -> bool:
     """
     Speak the given text via system TTS.
     
-    - text: Text to speak
-    - rate: words per minute (for pyttsx3)
-    - volume: 0.0 to 1.0
-    - prefer_vi: try to select Vietnamese voice if available
-    - use_gtts: prefer gTTS over pyttsx3 (better quality)
+    Args:
+        text: Text to speak
+        rate: words per minute (for pyttsx3)
+        volume: 0.0 to 1.0
+        prefer_vi: try to select Vietnamese voice if available (pyttsx3)
+        use_gtts: prefer gTTS over pyttsx3 (better quality)
+        lang: Language code for gTTS ('vi' or 'en')
 
     Returns True if queued successfully.
     """
@@ -205,7 +212,7 @@ def speak(text: str, rate: int = 140, volume: float = 1.0, prefer_vi: bool = Tru
     
     # Try gTTS first (better Vietnamese voice)
     if use_gtts and GTTS_AVAILABLE:
-        if speak_gtts(text):
+        if speak_gtts(text, lang=lang):
             return True
         print("[TTS] gTTS failed, falling back to pyttsx3...")
     

@@ -1,22 +1,102 @@
-# Chatbot Translator Mini (EN ➜ VI)
+# Chatbot Translator Mini (EN ➜ VI) + AI Voice Assistant
 
 Lightweight Python project that runs on Orange Pi + Ubuntu (ARM), supporting:
-- Voice input (microphone)
-- Translate English ➜ Vietnamese
-- Respond via text or optional speech (offline TTS)
+- 🎤 Voice input (microphone) - English & Vietnamese
+- 🌐 Translate English ↔ Vietnamese
+- 🤖 **AI Chat Assistant** (OpenRouter API - GPT-4, Claude, Llama, etc.)
+- 🔊 Respond via text or speech (TTS)
 - No GPU required, uses lightweight libraries
 
-## Project Structure
+---
+
+## 🚀 Quick Start
+
+### 1. Setup
+```bash
+# Ubuntu/Orange Pi
+sudo apt install -y python3 python3-pip python3-venv portaudio19-dev espeak
+
+# Windows/Mac
+# Just ensure Python 3.8+ is installed
+
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\Activate.ps1  # Windows PowerShell
+
+pip install -r requirements.txt
+```
+
+### 2. Basic Translation Mode
+```bash
+# Text mode - type English, get Vietnamese
+python -m translator_mini.main --mode text
+
+# Voice mode - speak English, get Vietnamese
+python -m translator_mini.main --mode voice --voice-output --loop
+```
+
+### 3. AI Voice Assistant (NEW!)
+```bash
+# Step 1: Get API key from https://openrouter.ai/keys
+# Step 2: Create api_key.txt with your key
+echo "sk-or-v1-your-key-here" > api_key.txt
+
+# Step 3: Run AI Assistant
+python -m translator_mini.main --mode assistant-text  # Text chat
+python -m translator_mini.main --mode assistant       # Voice chat
+```
+
+---
+
+## 📁 Project Structure
 ```
 translator_mini/
-├─ main.py
-├─ speech_to_text.py
-├─ translator.py
-├─ text_to_speech.py
-├─ chatbot.py
-├─ requirements.txt
-└─ README.md
+├── main.py              # CLI entry point
+├── chatbot.py           # Translation orchestrator
+├── translator.py        # EN↔VI translation
+├── speech_to_text.py    # Voice input (STT)
+├── text_to_speech.py    # Voice output (TTS)
+├── openrouter_client.py # OpenRouter AI API client (NEW)
+├── voice_assistant.py   # AI Voice Assistant (NEW)
+├── api_key.txt          # Your OpenRouter API key
+├── requirements.txt     # Dependencies
+└── *.md                 # Documentation files
 ```
+
+---
+
+## 🤖 AI Assistant Features
+
+### Available Modes
+| Mode | Command | Description |
+|------|---------|-------------|
+| Translator (voice) | `--mode voice` | Speak EN → Get VI |
+| Translator (text) | `--mode text` | Type EN → Get VI |
+| AI Chat (text) | `--mode assistant-text` | Chat with AI, voice output |
+| AI Chat (voice) | `--mode assistant` | Full voice conversation |
+| API Test | `--mode chat` | Direct API test |
+
+### AI Models
+```bash
+# List available models
+python -m translator_mini.main --list-models
+
+# Use specific model
+python -m translator_mini.main --mode assistant-text --model gpt-4o-mini
+python -m translator_mini.main --mode assistant --model claude-sonnet
+```
+
+| Model | Cost | Quality |
+|-------|------|---------|
+| `free` | $0 | Good for testing |
+| `gpt-4o-mini` | ~$0.15/1M tokens | Best value |
+| `claude-sonnet` | ~$3/1M tokens | Highest quality |
+
+📖 See **[OPENROUTER-SETUP.md](OPENROUTER-SETUP.md)** for detailed API setup.
+📖 See **[VOICE-ASSISTANT-GUIDE.md](VOICE-ASSISTANT-GUIDE.md)** for voice assistant guide.
+
+---
 
 ## Requirements
 - Python 3.8+
