@@ -12,3 +12,6 @@ pygame>=2.5.0
 
 # OpenRouter AI API
 requests>=2.31.0
+
+# Google Gemini direct client
+google-generativeai>=0.8.3

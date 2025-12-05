@@ -96,10 +96,11 @@ def run_text(voice_output: bool, tts_rate: int, input_text: Optional[str]):
 # ==============================================================================
 
 def run_assistant_voice(
-    model: str = "free",
+    model: str = "gemini-flash",
     mic_index: Optional[int] = None,
     use_gtts: bool = True,
-    input_language: str = "auto"
+    input_language: str = "auto",
+    provider: str = "gemini",
 ):
     """
     AI Voice Assistant mode using OpenRouter.
@@ -111,7 +112,8 @@ def run_assistant_voice(
             model=model,
             mic_index=mic_index,
             use_gtts=use_gtts,
-            input_language=input_language
+            input_language=input_language,
+            provider=provider,
         )
     except ImportError as e:
         print(f"[Main] Error importing voice_assistant: {e}")
@@ -119,9 +121,10 @@ def run_assistant_voice(
 
 
 def run_assistant_text(
-    model: str = "free",
+    model: str = "gemini-flash",
     use_gtts: bool = True,
-    speak_output: bool = True
+    speak_output: bool = True,
+    provider: str = "gemini",
 ):
     """
     AI Text Assistant mode using OpenRouter.
@@ -132,20 +135,25 @@ def run_assistant_text(
         run_text_assistant(
             model=model,
             use_gtts=use_gtts,
-            speak_output=speak_output
+            speak_output=speak_output,
+            provider=provider,
         )
     except ImportError as e:
         print(f"[Main] Error importing voice_assistant: {e}")
         print("       Make sure openrouter_client.py and voice_assistant.py exist.")
 
 
-def run_openrouter_chat(model: str = "free"):
+def run_openrouter_chat(model: str = "gemini-flash", provider: str = "gemini"):
     """
     Direct OpenRouter chat (no voice, just API test).
     """
     try:
-        from translator_mini.openrouter_client import interactive_chat
-        interactive_chat(model=model)
+        if provider == "gemini":
+            from translator_mini.gemini_client import interactive_chat
+            interactive_chat(model=model)
+        else:
+            from translator_mini.openrouter_client import interactive_chat
+            interactive_chat(model=model)
     except ImportError as e:
         print(f"[Main] Error importing openrouter_client: {e}")
 
@@ -167,19 +175,28 @@ def list_mics():
 
 def list_models():
     """List available AI models."""
+    print("[Main] Available AI models:")
     try:
-        from translator_mini.openrouter_client import MODELS
-        print("[Main] Available AI models:")
-        print("  Free models:")
-        for key, value in MODELS.items():
+        from translator_mini.openrouter_client import MODELS as OPENROUTER_MODELS
+        print("  OpenRouter:")
+        print("    Free:")
+        for key, value in OPENROUTER_MODELS.items():
             if "free" in key or ":free" in value:
-                print(f"    --model {key:15} → {value}")
-        print("  Paid models:")
-        for key, value in MODELS.items():
+                print(f"      --model {key:15} → {value}")
+        print("    Paid:")
+        for key, value in OPENROUTER_MODELS.items():
             if "free" not in key and ":free" not in value:
-                print(f"    --model {key:15} → {value}")
+                print(f"      --model {key:15} → {value}")
     except ImportError:
-        print("[Main] OpenRouter client not available.")
+        print("  OpenRouter client not available.")
+
+    try:
+        from translator_mini.gemini_client import MODELS as GEMINI_MODELS
+        print("  Gemini (direct):")
+        for key, value in GEMINI_MODELS.items():
+            print(f"      --model {key:15} → {value}")
+    except ImportError:
+        print("  Gemini client not available (install google-generativeai).")
 
 
 # ==============================================================================
@@ -228,8 +245,10 @@ Examples:
                         help="Input speech language (en-US, vi-VN)")
     
     # AI Assistant options
-    parser.add_argument("--model", type=str, default="free",
-                        help="AI model for assistant modes (free, gpt-4o-mini, claude-sonnet, etc.)")
+    parser.add_argument("--model", type=str, default="gemini-flash",
+                        help="AI model for assistant modes (e.g., gemini-flash, gemini-pro, gpt-4o-mini)")
+    parser.add_argument("--provider", choices=["openrouter", "gemini"], default="gemini",
+                        help="AI provider: gemini (direct Google API, default) or openrouter")
     parser.add_argument("--gtts", dest="gtts", action="store_true",
                         help="Use Google TTS (default, better voice)")
     parser.add_argument("--no-gtts", dest="gtts", action="store_false",
@@ -289,6 +308,7 @@ if __name__ == "__main__":
             mic_index=args.mic_index,
             use_gtts=args.gtts,
             input_language=args.lang,
+            provider=args.provider,
         )
     
     elif args.mode == "assistant-text":
@@ -296,7 +316,8 @@ if __name__ == "__main__":
             model=args.model,
             use_gtts=args.gtts,
             speak_output=not args.no_speak,
+            provider=args.provider,
         )
     
     elif args.mode == "chat":
-        run_openrouter_chat(model=args.model)
+        run_openrouter_chat(model=args.model, provider=args.provider)

@@ -12,11 +12,30 @@ from translator_mini.speech_to_text import listen_and_recognize, list_microphone
 from translator_mini.text_to_speech import speak
 from translator_mini.openrouter_client import (
     OpenRouterChatbot,
-    get_api_key,
+    get_api_key as get_openrouter_api_key,
     translate_en_to_vi,
     translate_vi_to_en,
-    MODELS
+    MODELS as OPENROUTER_MODELS,
 )
+
+# Gemini (direct) client is optional; import lazily
+try:
+    from translator_mini.gemini_client import (
+        GeminiChatbot,
+        get_api_key as get_gemini_api_key,
+        MODELS as GEMINI_MODELS,
+    )
+except Exception:  # pragma: no cover - missing dependency or file
+    GeminiChatbot = None
+    get_gemini_api_key = None
+    GEMINI_MODELS = {}
+
+
+def _model_label(provider: str, model: str) -> str:
+    """Resolve model id for display based on provider."""
+    if provider == "gemini":
+        return GEMINI_MODELS.get(model, model)
+    return OPENROUTER_MODELS.get(model, model)
 
 
 # ==============================================================================
@@ -59,6 +78,15 @@ def detect_language(text: str) -> str:
 # VOICE ASSISTANT CLASS
 # ==============================================================================
 
+def _build_chatbot(provider: str, model: str, system_prompt: str):
+    """Factory to create chatbot per provider."""
+    if provider == "gemini":
+        if GeminiChatbot is None:
+            raise ImportError("Gemini client not available. Install google-generativeai and ensure gemini_client.py exists.")
+        return GeminiChatbot(model=model, system_prompt=system_prompt)
+    return OpenRouterChatbot(model=model, system_prompt=system_prompt)
+
+
 class VoiceAssistant:
     """
     Voice-enabled AI Assistant with bilingual support (EN/VI).
@@ -78,6 +106,7 @@ class VoiceAssistant:
         use_gtts: bool = True,  # True = Google TTS (giọng hay), False = pyttsx3 (offline)
         voice_rate: int = 150,
         input_language: str = "auto",  # "auto", "en", "vi"
+        provider: str = "openrouter",
     ):
         """
         Initialize Voice Assistant.
@@ -91,26 +120,25 @@ class VoiceAssistant:
             input_language: Voice input language ("auto", "en", "vi")
         """
         self.model = model
+        self.provider = provider
         self.mic_index = mic_index
         self.use_gtts = use_gtts
         self.voice_rate = voice_rate
         self.input_language = input_language
         
         # Initialize chatbot
-        self.chatbot = OpenRouterChatbot(
-            model=model,
-            api_key=api_key,
-            system_prompt=(
-                "Bạn là trợ lý giọng nói AI thông minh tên là Mini, nói tiếng Việt. "
-                "Trả lời ngắn gọn và tự nhiên như đang nói chuyện. "
-                "QUAN TRỌNG: Khi người dùng nói 'dịch' hoặc 'translate' kèm theo một câu tiếng Anh, "
-                "hãy dịch câu đó sang tiếng Việt. Ví dụ: 'dịch I love you' → 'Tôi yêu bạn'. "
-                "Chỉ trả về bản dịch, không giải thích thêm. "
-                "Nếu không phải yêu cầu dịch, hãy trả lời bằng tiếng Việt."
-            )
+        system_prompt = (
+            "Bạn là trợ lý giọng nói AI thông minh tên là Mini, nói tiếng Việt. "
+            "Trả lời ngắn gọn và tự nhiên như đang nói chuyện. "
+            "QUAN TRỌNG: Khi người dùng nói 'dịch' hoặc 'translate' kèm theo một câu tiếng Anh, "
+            "hãy dịch câu đó sang tiếng Việt. Ví dụ: 'dịch I love you' → 'Tôi yêu bạn'. "
+            "Chỉ trả về bản dịch, không giải thích thêm. "
+            "Nếu không phải yêu cầu dịch, hãy trả lời bằng tiếng Việt."
         )
-        
-        print(f"[VoiceAssistant] Initialized with model: {MODELS.get(model, model)}")
+
+        self.chatbot = _build_chatbot(provider=provider, model=model, system_prompt=system_prompt)
+        model_label = (GEMINI_MODELS if provider == "gemini" else OPENROUTER_MODELS).get(model, model)
+        print(f"[VoiceAssistant] Initialized with provider={provider}, model: {model_label}")
     
     def listen(self, prompt: str = "🎤 Đang nghe... (Listening...)") -> Optional[str]:
         """
@@ -241,7 +269,7 @@ class VoiceAssistant:
         """
         print("\n" + "=" * 60)
         print("🎙️  VOICE ASSISTANT - MINI")
-        print(f"   Model: {MODELS.get(self.model, self.model)}")
+        print(f"   Model: {_model_label(self.provider, self.model)}")
         print("   Nói 'thoát' hoặc 'quit' để kết thúc")
         print("   💡 Nói 'dịch [câu tiếng Anh]' để dịch sang tiếng Việt")
         print("=" * 60 + "\n")
@@ -286,24 +314,22 @@ class TextAssistant:
         use_gtts: bool = True,  # True = Google TTS (giọng hay), False = pyttsx3
         voice_rate: int = 150,
         speak_output: bool = True,
+        provider: str = "openrouter",
     ):
         self.model = model
+        self.provider = provider
         self.use_gtts = use_gtts
         self.voice_rate = voice_rate
         self.speak_output = speak_output
-        
-        self.chatbot = OpenRouterChatbot(
-            model=model,
-            api_key=api_key,
-            system_prompt=(
-                "Bạn là trợ lý AI thông minh tên là Mini, nói tiếng Việt. "
-                "Trả lời ngắn gọn và tự nhiên. "
-                "QUAN TRỌNG: Khi người dùng nói 'dịch' hoặc 'translate' kèm theo một câu tiếng Anh, "
-                "hãy dịch câu đó sang tiếng Việt. Ví dụ: 'dịch I love you' → 'Tôi yêu bạn'. "
-                "Chỉ trả về bản dịch, không giải thích thêm. "
-                "Nếu không phải yêu cầu dịch, hãy trả lời bằng tiếng Việt."
-            )
+        system_prompt = (
+            "Bạn là trợ lý AI thông minh tên là Mini, nói tiếng Việt. "
+            "Trả lời ngắn gọn và tự nhiên. "
+            "QUAN TRỌNG: Khi người dùng nói 'dịch' hoặc 'translate' kèm theo một câu tiếng Anh, "
+            "hãy dịch câu đó sang tiếng Việt. Ví dụ: 'dịch I love you' → 'Tôi yêu bạn'. "
+            "Chỉ trả về bản dịch, không giải thích thêm. "
+            "Nếu không phải yêu cầu dịch, hãy trả lời bằng tiếng Việt."
         )
+        self.chatbot = _build_chatbot(provider=provider, model=model, system_prompt=system_prompt)
     
     def chat(self, user_input: str) -> Optional[str]:
         """Process text input and return/speak response."""
@@ -324,7 +350,7 @@ class TextAssistant:
         """Run interactive text chat."""
         print("\n" + "=" * 60)
         print("💬 TEXT ASSISTANT - MINI")
-        print(f"   Model: {MODELS.get(self.model, self.model)}")
+        print(f"   Model: {_model_label(self.provider, self.model)}")
         print("   Gõ 'quit' để thoát, 'reset' để xóa lịch sử")
         print("   Gõ 'voice on/off' để bật/tắt giọng nói")
         print("   💡 Gõ 'dịch [câu tiếng Anh]' để dịch sang tiếng Việt")
@@ -379,20 +405,28 @@ def run_voice_assistant(
     model: str = "free",
     mic_index: Optional[int] = None,
     use_gtts: bool = False,
-    input_language: str = "auto"
+    input_language: str = "auto",
+    provider: str = "openrouter",
 ) -> None:
     """Run voice assistant with specified settings."""
-    if not get_api_key():
-        print("❌ Không tìm thấy API key!")
-        print("   1. Lấy key tại: https://openrouter.ai/keys")
-        print("   2. Tạo file api_key.txt chứa key")
-        return
-    
+    if provider == "gemini":
+        if get_gemini_api_key is None or not get_gemini_api_key():
+            print("❌ Không tìm thấy Gemini API key!")
+            print("   - Tạo file gemini_api_key.txt chứa key AIza... hoặc set biến GEMINI_API_KEY")
+            return
+    else:
+        if not get_openrouter_api_key():
+            print("❌ Không tìm thấy OpenRouter API key!")
+            print("   1. Lấy key tại: https://openrouter.ai/keys")
+            print("   2. Tạo file api_key.txt chứa key")
+            return
+
     assistant = VoiceAssistant(
         model=model,
         mic_index=mic_index,
         use_gtts=use_gtts,
-        input_language=input_language
+        input_language=input_language,
+        provider=provider,
     )
     assistant.run()
 
@@ -400,19 +434,27 @@ def run_voice_assistant(
 def run_text_assistant(
     model: str = "free",
     use_gtts: bool = False,
-    speak_output: bool = True
+    speak_output: bool = True,
+    provider: str = "openrouter",
 ) -> None:
     """Run text assistant with optional voice output."""
-    if not get_api_key():
-        print("❌ Không tìm thấy API key!")
-        print("   1. Lấy key tại: https://openrouter.ai/keys")
-        print("   2. Tạo file api_key.txt chứa key")
-        return
-    
+    if provider == "gemini":
+        if get_gemini_api_key is None or not get_gemini_api_key():
+            print("❌ Không tìm thấy Gemini API key!")
+            print("   - Tạo file gemini_api_key.txt chứa key AIza... hoặc set biến GEMINI_API_KEY")
+            return
+    else:
+        if not get_openrouter_api_key():
+            print("❌ Không tìm thấy OpenRouter API key!")
+            print("   1. Lấy key tại: https://openrouter.ai/keys")
+            print("   2. Tạo file api_key.txt chứa key")
+            return
+
     assistant = TextAssistant(
         model=model,
         use_gtts=use_gtts,
-        speak_output=speak_output
+        speak_output=speak_output,
+        provider=provider,
     )
     assistant.run()
 

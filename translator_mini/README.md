@@ -55,6 +55,13 @@ python -m translator_mini.main --mode assistant-text     # Text input, voice out
 # Tuỳ chọn model tốt hơn
 python -m translator_mini.main --mode assistant --model gpt-4o-mini
 
+# Dùng trực tiếp Google Gemini (không qua OpenRouter)
+# Lưu ý: dùng model id mới (Google đổi tên, bản cũ dễ 404)
+echo "AIza-your-gemini-key" > gemini_api_key.txt
+python -m translator_mini.main --mode assistant --provider gemini --model gemini-flash   # alias → gemini-1.5-flash-latest
+# Hoặc rõ phiên bản:
+# python -m translator_mini.main --mode assistant --provider gemini --model gemini-flash-002
+
 # Tắt giọng nói ở text mode
 python -m translator_mini.main --mode assistant-text --no-speak
 
