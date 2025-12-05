@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  translator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: translator-mini:latest
+    container_name: chatbot_translator
+    
+    # Mount audio devices (Linux/WSL2 only - xem hướng dẫn bên dưới cho Windows)
+    # devices:
+    #   - /dev/snd:/dev/snd
+    
+    # Interactive mode
+    stdin_open: true
+    tty: true
+    
+    # Network mode
+    network_mode: bridge
+    
+    # Environment variables (optional)
+    environment:
+      - PYTHONUNBUFFERED=1
+    
+    # Default command - text mode for Docker Desktop testing
+    command: python3 main.py --mode text
+
+# Note: Để test voice mode trên Windows Docker Desktop, 
+# bạn cần WSL2 hoặc chạy container với --privileged
+# Xem README-DOCKER.md để biết chi tiết

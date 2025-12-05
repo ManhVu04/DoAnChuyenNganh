@@ -1,0 +1,7 @@
+# Core features
+SpeechRecognition>=3.10.0
+pyttsx3>=2.90
+deep-translator>=1.11.4
+
+# Microphone capture
+pyaudio>=0.2.11
